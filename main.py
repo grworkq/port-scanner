@@ -1,5 +1,5 @@
 import sys, time, socket
-import get_domain, get_range
+import network, input_utils
 
 services: dict[str, int] = {
     21: "FTP",
@@ -16,11 +16,11 @@ services: dict[str, int] = {
 
 ip_address: str
 domain_name: str
-ip_address, domain_name = get_domain.get_domain()
+ip_address, domain_name = network.get_domain()
 
 start: int
 end: int
-start, end = get_range.get_range()
+start, end = input_utils.get_range()
 
 cnt: int = 0
 open_ports: list[int] = []
