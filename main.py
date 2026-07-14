@@ -1,8 +1,7 @@
-import sys
-import time
-import socket
+import sys, time, socket
+import get_domain, get_range
 
-services = {
+services: dict[str, int] = {
     21: "FTP",
     22: "SSH",
     25: "SMTP",
@@ -15,59 +14,46 @@ services = {
     3389: "RDP"
 }
 
+ip_address: str
+domain_name: str
+ip_address, domain_name = get_domain.get_domain()
 
-domain = input('Введите домен: ')
-try:
-    adr = socket.gethostbyname(domain)
-except:
-    domain = input('пожалуйста введите корректный домен: ')
-    adr = socket.gethostbyname(domain)
+start: int
+end: int
+start, end = get_range.get_range()
 
-diapason = input('Введите через "-" диапазон сканирования (например, 1-1024): ')
-try:
-    start,end = map(int,diapason.split('-'))
-except:
-    diapason = input("пожалуйста введите корректный диапазон (пример: 1-1024): ")
+cnt: int = 0
+open_ports: list[int] = []
 
-
-
-cnt = 0
-open_ports = []
-
-symbols = ['|', '/', '-', '\\']
-
-start_time = time.time()
+start_time: float = time.time()
 
 for port in range(start, end + 1):
-    ready_ports = port
-    sys.stdout.write(f"\rСканирование: порт {ready_ports}/{end}")
+    sys.stdout.write(f"\rСканирование: порт {port}/{end}")
     sys.stdout.flush()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(3)
         try:
-            sock.connect((adr, port))
+            sock.connect((ip_address, port))
             cnt += 1
             open_ports.append(port)
         except:
             continue
 
         
+end_time: float = time.time()
 
-end_time = time.time()
-
-total_time = round(end_time - start_time, 2)
+total_time: float = round(end_time - start_time, 2)
 print("\n")
 print("="*45)
-print(f"Домен сервера: {domain}")
-print(f"\nIP адрес сервера: {adr}")
+print(f"Домен сервера: {domain_name}")
+print(f"\nIP адрес сервера: {ip_address}")
 print(f"Проверено портов: {end - start}")
 print(f"Сканирование заняло {total_time} секунд.")
-
 
 if cnt > 0:
     print(f"\nВсего открытых портов: {cnt}")
     print("Список открытых портов:")
-    num = 0
+    num: int = 0
     for open_port in open_ports:
         service = services.get(open_port, "Неизвестно")
         num += 1
